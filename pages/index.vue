@@ -1,25 +1,50 @@
 <template>
-  <div class="container">
-    <div>
-      <logo />
-      <h1 class="title">
-        foodAdvisor
-      </h1>
-      <h2 class="subtitle">
-        Restaurant recomendations
-      </h2>
-      <div class="links">
+  <div id="main" class="container is-fluid">
+    <h1 class="title is-1 has-text-centered">
+      foodAdvisor
+    </h1>
+    <h2 class="subtitle has-text-centered">
+      Restaurant recomendations
+    </h2>
+    <banner id="banner" buttonText="Show subscribe" @onShowClick="showForm = !showForm">
+      <search-form
+        slot="header"
+        v-if="showForm"
+        placeholder="johndoe@nowhere.nop"
+        buttonText="Subscribe"
+        :showLoading="showLoading"
+        @onActionClick="postSubscribeRequest"/>
+
+      <div slot="header" v-else>
+        <h2 class="title is-2">Subscribe to our news!</h2>
+      </div>
+    </banner>
+    <div class="columns">
+      <div v-for="restaurant in restaurants" :key="restaurant.id" class="column is-one-quarter-widescreen is-one-third-tablet" >
+        <restaurant-card
+          :title="restaurant.name"
+          :category="restaurant.category"
+          :info-url="restaurant.slug"
+          :image-src="restaurant.image">
+          {{ restaurant.description }}
+        </restaurant-card>
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-narrow">
         <a
           href="https://nuxtjs.org/"
           target="_blank"
-          class="button--green"
+          class="button is-primary is-outlined"
         >
           Documentation
         </a>
+      </div>
+      <div class="column is-narrow">
         <a
           href="https://github.com/nuxt/nuxt.js"
           target="_blank"
-          class="button--grey"
+          class="button is-outlined"
         >
           GitHub
         </a>
@@ -29,44 +54,54 @@
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+import RestaurantCard from '@/components/RestaurantCard'
+import Banner from '@/components/Banner'
+import SearchForm from '@/components/SearchForm'
+import restaurantApi from '@/services/api'
+import { db } from '@/plugins/firebase'
 
 export default {
   components: {
-    Logo
+    RestaurantCard,
+    Banner,
+    SearchForm
+  },
+  data() {
+    return {
+      showForm: false,
+      showLoading: false,
+      restaurants: []
+    }
+  },
+  methods: {
+    postSubscribeRequest(email) {
+      this.showLoading = true
+      restaurantApi.postSubscribe(email)
+        .then((result) => {
+          if (result.status === 201) {
+            this.showLoading = false
+          }
+        })
+        .catch((error) => {
+          console.log(`Error while subscribing. Error code ${error.response.code}`)
+          this.showLoading = false
+        })
+    }
+  },
+  mounted() {
+    restaurantApi.get('restaurants')
+      .then((response) => {
+        this.restaurants = response
+      })
+  },
+  created() {
+    console.log(db)
   }
 }
 </script>
 
 <style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+#main {
+  margin-top: 1em;
 }
 </style>
