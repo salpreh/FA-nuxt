@@ -6,7 +6,7 @@
     <h2 class="subtitle has-text-centered">
       Restaurant recomendations
     </h2>
-    <banner id="banner" buttonText="Show subscribe" @onShowClick="showForm = !showForm">
+    <banner id="banner" :buttonText="showButtonText" @onShowClick="showForm = !showForm">
       <search-form
         slot="header"
         v-if="showForm"
@@ -25,7 +25,7 @@
           :title="restaurant.name"
           :category="restaurant.category"
           :info-url="restaurant.slug"
-          :image-src="restaurant.image">
+          :image-src="restaurant.imageUrl">
           {{ restaurant.description }}
         </restaurant-card>
       </div>
@@ -73,6 +73,11 @@ export default {
       restaurants: []
     }
   },
+  computed: {
+    showButtonText() {
+      return this.showForm ? 'Hide subscribe' : 'Show subscribe'
+    }
+  },
   methods: {
     postSubscribeRequest(email) {
       this.showLoading = true
@@ -89,13 +94,17 @@ export default {
     }
   },
   mounted() {
-    restaurantApi.get('restaurants')
-      .then((response) => {
-        this.restaurants = response
+    this.restaurants = []
+
+    db.collection('restaurants').get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          this.restaurants.push({
+            id: doc.id,
+            ...doc.data()
+          })
+        })
       })
-  },
-  created() {
-    console.log(db)
   }
 }
 </script>
