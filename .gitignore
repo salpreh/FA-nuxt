@@ -3,6 +3,9 @@
 # IDE
 .vscode/
 
+# Plugins config ignored
+plugins/*.config.js
+
 ### Node template
 # Logs
 /logs
