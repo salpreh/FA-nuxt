@@ -1,10 +1,19 @@
 <template>
   <div id="main">
-    <nuxt />
+    <navbar id="navbar"/>
+    <nuxt id="content"/>
   </div>
 </template>
 
-<style>
+<script>
+import Navbar from '@/components/Navbar'
+export default {
+  components: {
+    Navbar
+  }
+}
+</script>
+<style scoped>
 html {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -24,7 +33,14 @@ html {
   margin: 0;
 }
 
-#main {
-  margin-top: 1.2em;
+#navbar {
+  position:fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+#content {
+  margin-top: 5em;
 }
 </style>
