@@ -1,6 +1,10 @@
-# foodAdvisor
+ # foodAdvisor
 
 > Restaurant recomendations
+
+## Notes
+
+This is just a toy application to try out nuxtJS
 
 ## Build Setup
 
